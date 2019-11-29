@@ -4,6 +4,7 @@ import time
 import json
 import torch
 import logging
+import datetime
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from torch.utils.data.dataloader import DataLoader
@@ -24,7 +25,7 @@ def run_pvi_experiment(device, results_dir, seeds, data_config={}, model_config=
     test_times = []
 
     for seed in range(seeds):
-        print(f'Running seed {seed}/{seeds}. Saving in {results_dir}')
+        print(f'Running seed {seed+1}/{seeds}. Saving in {results_dir}')
         train_shards, validation_shard, test_shard = genereate_shards(data_config, seed)
 
         num_train_shards = len(train_shards)
@@ -38,6 +39,7 @@ def run_pvi_experiment(device, results_dir, seeds, data_config={}, model_config=
             raise ValueError(f"Unrecognised model type {model_config['data_model']['type']}")
 
         model_hyperparameters = model_config['data_model']['hyperparameters']
+        model_hyperparameters['device'] = device
 
         # Initialise a model with the parameters.
         # We might train this a bit to precondition, or use it 
@@ -107,12 +109,14 @@ def run_pvi_experiment(device, results_dir, seeds, data_config={}, model_config=
                 if tll > best_tll:
                     server.model.save_model(os.path.join(results_dir, f'best_model_{seed}'))
 
+                curr_time = time.time() - start_time
+
                 test_log_loss.append(tll)
                 test_reg_loss.append(trl)
                 test_epoch.append(test_epoch)
                 test_time.append(time.time() - start_time)
                 best_tll = max(test_log_loss)
-                print(f'Epoch {epoch}: \t log loss {tll: 0.6f}, accuracy {trl*100:0.3f}, damping {server.current_damping_factor}')
+                print(f'Epoch {epoch}: \t log loss {tll: 0.6f}, accuracy {trl*100:0.3f}, damping {server.current_damping_factor:0.4f} , time {datetime.timedelta(seconds=curr_time)}')
 
 
         test_log_losses.append(test_log_loss)

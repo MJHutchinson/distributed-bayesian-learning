@@ -8,7 +8,7 @@ from experiments.experiment_pvi import run_pvi_experiment
 data_config = {
     'dataset': 'MNIST',
     'num_shards': 10,
-    'data_root': '/data/hemispingus/mhutchin/Projects/distributed-bayesian-learning/data',
+    'data_root': os.path.expandvars('$SCRATCH_DIR/data'),
     'num_validation': 0,
 }
 
@@ -43,5 +43,7 @@ training_config = {
     'record_freq': 1,
 }
 
-run_pvi_experiment('cpu', 'results/pvi_test', 3, data_config, model_config, training_config)
+results_dir = os.path.expandvars('$SCRATCH_DIR/results/distributed-bayesian-learning/pvi-test')
+
+run_pvi_experiment('cuda:0', results_dir, 3, data_config, model_config, training_config)
 
