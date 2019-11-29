@@ -1,0 +1,40 @@
+{
+    "experiment_config": {
+        "data_config": {
+            "dataset": "MNIST",
+            "num_shards": 10,
+            "data_root": "$SCRATCH_DIR/data",
+            "num_validation": 0
+        },
+        "model_config": {
+            "type": "pvi",
+            "data_model": {
+                "type": "bnn",
+                "hyperparameters": {
+                    "in_features": 784,
+                    "hidden_sizes": [200],
+                    "out_features": 10,
+                    "train_samples": 10,
+                    "test_samples": 10,
+                    "batch_size": 200,
+                    "type": "classification",
+                    "lr": 5e-3,
+                    "N_sync": 100
+                }
+            },
+            "server_config": {
+                "type": "syncronous",
+                "hyperparameters": {
+                    "damping_factor": 0.95,
+                    "damping_decay": 1.718e-3
+                }
+            }
+        },
+        "training_config": {
+            "epochs": 100,
+            "record_freq": 1
+        }
+    },
+    "results_dir": "$SCRATCH_DIR/results/distributed-bayesian-learning/pvi-test",
+    "seeds": 3
+}
