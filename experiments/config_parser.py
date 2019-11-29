@@ -57,7 +57,8 @@ if __name__ == '__main__':
     os.makedirs(
         os.path.expandvars(
                 os.path.join(sweep_config['sweep_config']['output_dir'], 'configs')
-            )
+            ),
+        exist_ok=True
     )
 
     for config, name in zip(configs, names):
