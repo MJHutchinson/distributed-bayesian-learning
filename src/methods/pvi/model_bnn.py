@@ -73,6 +73,7 @@ class BNNModel(Model):
 
             kl = self.model.kl() 
             loss = -ll / (num_batch * self.train_samples) + (kl / len(dataset))
+            loss = loss * len(dataset)
 
             loss.backward()
             optimiser.step()
