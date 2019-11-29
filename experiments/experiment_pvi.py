@@ -24,6 +24,7 @@ def run_pvi_experiment(device, results_dir, seeds, data_config={}, model_config=
     test_times = []
 
     for seed in range(seeds):
+        print(f'Running seed {seed}/{seeds}. Saving in {results_dir}')
         train_shards, validation_shard, test_shard = genereate_shards(data_config, seed)
 
         num_train_shards = len(train_shards)
