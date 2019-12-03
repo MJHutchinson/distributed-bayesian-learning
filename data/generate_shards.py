@@ -4,13 +4,14 @@ sys.path.append(os.getcwd())
 
 from torchvision import datasets, transforms
 
-def genereate_shards(data_config, seed):
+def genereate_shards(data_config, seed, device=None):
     if data_config['dataset'] == 'MNIST':
         from data.distributed_mnist import DistributedMNIST
 
         num_shards = data_config['num_shards']
         data_root = data_config['data_root']
         num_validation = data_config['num_validation']
+        flatten = data_config['flatten']
 
         train_shards = [
             DistributedMNIST(
@@ -20,11 +21,8 @@ def genereate_shards(data_config, seed):
                 num_validation=num_validation,
                 seed=seed,
                 train=True,
-                transform=transforms.Compose([
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.1307,), (0.3081,)),
-                    transforms.Lambda(lambda x: x.reshape(-1))
-                ]),
+                flatten=flatten,
+                device=device,
                 download=True
             )
             for shard in range(num_shards)
@@ -37,11 +35,8 @@ def genereate_shards(data_config, seed):
                 num_validation=num_validation,
                 seed=seed,
                 train=True,
-                transform=transforms.Compose([
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.1307,), (0.3081,)),
-                    transforms.Lambda(lambda x: x.reshape(-1))
-                ]),
+                flatten=flatten,
+                device=device,
                 download=True
             )
 
@@ -52,11 +47,8 @@ def genereate_shards(data_config, seed):
                 num_validation=num_validation,
                 seed=seed,
                 train=False,
-                transform=transforms.Compose([
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.1307,), (0.3081,)),
-                    transforms.Lambda(lambda x: x.reshape(-1))
-                ]),
+                flatten=flatten,
+                device=device,
                 download=True
             )
 
