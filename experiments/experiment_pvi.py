@@ -26,7 +26,7 @@ def run_pvi_experiment(device, results_dir, seeds, data_config={}, model_config=
 
     for seed in range(seeds):
         print(f'Running seed {seed+1}/{seeds}. Saving in {results_dir}')
-        train_shards, validation_shard, test_shard = genereate_shards(data_config, seed)
+        train_shards, validation_shard, test_shard = genereate_shards(data_config, seed, device)
 
         num_train_shards = len(train_shards)
 
@@ -113,7 +113,7 @@ def run_pvi_experiment(device, results_dir, seeds, data_config={}, model_config=
 
                 test_log_loss.append(tll)
                 test_reg_loss.append(trl)
-                test_epoch.append(test_epoch)
+                test_epoch.append(epoch+1)
                 test_time.append(time.time() - start_time)
                 best_tll = max(test_log_loss)
                 print(f'Epoch {epoch}: \t log loss {tll: 0.6f}, accuracy {trl*100:0.3f}, damping {server.current_damping_factor:0.4f} , time {datetime.timedelta(seconds=curr_time)}')
@@ -143,31 +143,28 @@ def run_pvi_experiment(device, results_dir, seeds, data_config={}, model_config=
         }, f)
 
     # plot some results
+    from viz.plot_runs import plot_runs
+    import numpy as np
 
-    plt.loglog(test_epochs, test_log_losses)
-    plt.xlabel('epochs/server communications')
-    plt.ylabel('test log likelihood')
-    plt.savefig(os.path.join(results_dir, 'epochs_ll.pdf'))
-    plt.savefig(os.path.join(results_dir, 'epochs_ll.png'))
-    plt.close()
+    test_nlls = -np.array(test_log_losses)
 
-    plt.loglog(test_epochs, test_reg_losses)
-    plt.xlabel('epochs/server communications')
-    plt.ylabel('test regular loss')
-    plt.savefig(os.path.join(results_dir, 'epochs_reg.pdf'))
-    plt.savefig(os.path.join(results_dir, 'epochs_reg.png'))
-    plt.close()
+    test_regs = np.array(test_reg_losses)
 
-    plt.loglog(test_times, test_log_losses)
-    plt.xlabel('time(s)')
-    plt.ylabel('test log likelihood')
-    plt.savefig(os.path.join(results_dir, 'time_ll.pdf'))
-    plt.savefig(os.path.join(results_dir, 'time_ll.png'))
-    plt.close()
+    if data_config['type'] == 'classification':
+        test_regs = 1 - test_regs
 
-    plt.loglog(test_times, test_reg_losses)
-    plt.xlabel('tims(s)')
-    plt.ylabel('test regular loss')
-    plt.savefig(os.path.join(results_dir, 'time_reg.pdf'))
-    plt.savefig(os.path.join(results_dir, 'time_reg.png'))
-    plt.close()
+    test_epochs = np.array(test_epochs)
+
+    test_times = np.array(test_times)
+
+    if data_config['type'] == 'classification':
+        reg_loss_name = '% error'
+    elif data_config['type'] == 'regression':
+        reg_loss_name = 'mse'
+
+    labels = list(range(seeds))
+
+    plot_runs(test_epochs, test_nlls, 'epochs', 'nlls', labels=labels, same_color=False, loglog=True, savefig=results_dir + '/epoch_nll')
+    plot_runs(test_epochs, test_regs, 'epochs', reg_loss_name, labels=labels, same_color=False, loglog=True, savefig=results_dir + '/epoch_reg')
+    plot_runs(test_times, test_nlls, 'time (s)', 'nlls', labels=labels, same_color=False, loglog=True, savefig=results_dir + '/time_nll')
+    plot_runs(test_times, test_regs, 'time (s)', reg_loss_name, labels=labels, same_color=False, loglog=True, savefig=results_dir + '/time_reg')
