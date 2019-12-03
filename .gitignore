@@ -108,4 +108,4 @@ venv.bak/
 data/DistributedMNIST/*
 results/*
 test.py
-tests/test_experiment_pvi.py
+tests/*
