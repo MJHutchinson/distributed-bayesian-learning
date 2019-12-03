@@ -16,4 +16,11 @@ if len(sys.argv) != 3:
 device = sys.argv[1]
 config_path = sys.argv[2]
 
-run_experiment(device, config_path)
+if os.path.isdir(config_path):
+    while len(os.listdir()) > 0:
+        config_file = os.listdir().pop()
+        config_file = os.path.join(config_path, config_file)
+        os.remove(config_file)
+        run_experiment(device, config_file)
+else:
+    run_experiment(device, config_path)

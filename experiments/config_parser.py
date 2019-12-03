@@ -60,11 +60,23 @@ if __name__ == '__main__':
             ),
         exist_ok=True
     )
+    os.makedirs(
+        os.path.expandvars(
+                os.path.join(sweep_config['sweep_config']['output_dir'], 'configs_to_run')
+            ),
+        exist_ok=True
+    )
 
     for config, name in zip(configs, names):
         with open(
             os.path.expandvars(
                 os.path.join(sweep_config['sweep_config']['output_dir'], 'configs', name + '.json')),
+                'w'
+            ) as f:
+            json.dump(config, f)
+        with open(
+            os.path.expandvars(
+                os.path.join(sweep_config['sweep_config']['output_dir'], 'configs_to_run', name + '.json')),
                 'w'
             ) as f:
             json.dump(config, f)
