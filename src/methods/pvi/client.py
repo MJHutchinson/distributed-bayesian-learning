@@ -50,7 +50,13 @@ class PVIClient(Client):
         lambda_new = utils.list_add(lambda_old, delta_lambda_i)
 
         t_i_new = utils.list_add(t_i_old, delta_lambda_i)
+        t_i_new = [
+            p.enforce_precision_negativity(delta=-1e-6)
+            for p in t_i_new
+        ]
         self.t_i = t_i_new
+
+        delta_lambda_i = utils.list_sub(t_i_new, t_i_old)
 
         return delta_lambda_i
 

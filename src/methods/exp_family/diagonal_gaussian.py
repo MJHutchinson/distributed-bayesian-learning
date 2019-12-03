@@ -199,6 +199,13 @@ class DiagGaussianNatParams(exp_family.NatParams):
                 nu_2 = torch.tensor(self.nu_2).to(device)
             )
 
+    def enforce_precision_negativity(self, delta=-1e-5):
+        errors = self.nu_2[self.nu_2 >= delta]
+        if errors.shape[0] > 0:
+            print(f'woops, having to clip precisions... of {errors.shape} values, mean {errors.mean()}')
+            self.nu_2[self.nu_2 >= delta] = delta
+        return self
+
     def __add__(self, other):
         return DiagGaussianNatParams(self.nu_1 + other.nu_1, self.nu_2 + other.nu_2)
 
@@ -232,6 +239,45 @@ class DiagGaussianNatParams(exp_family.NatParams):
     def __repr__(self):
         return f'{type(self).__name__} with \n \t nu_1 {self.nu_1} \n \t nu_2 {self.nu_2}'
 
+
+# class DiagGaussianParameterList(object):
+
+#     def __init__(self, initial_list):
+#         self.list = initial_list
+
+#     def list_uniform_prior(self, prior_mean, prior_var):
+#         self.list = [
+#             parameter.to_moment_params()
+#             for parameter
+#             in self.list
+#         ]
+
+#         self.list =  [
+#             DiagGaussianMomentParams(
+#                 mean = torch.ones_like(parameter.mean) * prior_mean,
+#                 variance = torch.ones_like(parameter.variance) * prior_var
+#             ).to_nat_params()
+#             for parameter
+#             in parameters
+#         ]
+
+#         return self
+
+#     def list_uninformative_prior(parameters):
+#         parameters = [
+#             parameter.to_moment_params()
+#             for parameter
+#             in parameters
+#         ]
+
+#         return [
+#             DiagGaussianNatParams(
+#                 nu_1 = torch.zeros_like(parameter.mean),
+#                 nu_2 = torch.zeros_like(parameter.variance)
+#             ).to_nat_params()
+#             for parameter
+#             in parameters
+#         ]
 
 def list_uniform_prior(parameters, prior_mean, prior_var):
     parameters = [
