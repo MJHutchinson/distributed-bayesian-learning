@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import numpy as np
+
 from torch.distributions import Normal, kl_divergence
 
 class BayesianLinearReparam(nn.Module):

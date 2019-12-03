@@ -6,9 +6,11 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data.dataloader import DataLoader
 
+import numpy as np
+
 import src.methods.exp_family.diagonal_gaussian as dg
 import src.methods.exp_family.utils as utils
-from src.methods.pvi.model import Model
+from src.methods.base.model import Model
 from src.models.bnn.model import BayesianMLPReparam, BayesianLinearReparam
 
 
@@ -57,7 +59,7 @@ class BNNModel(Model):
         N_left = self.N_sync
 
         # while N_left > 0:
-        for data, target in dataloader:
+        for i, (data, target) in enumerate(dataloader):
             data, target = data.to(self.device), target.to(self.device)
             num_batch, _ = data.shape
             optimiser.zero_grad()
@@ -124,7 +126,18 @@ class BNNModel(Model):
         return float(test_log_loss.cpu()), float(test_reg_loss.cpu())
 
     def predict(self, x, parameters=None, hyperparameters=None):
-        return None
+        self.set_parameters(parameters)
+        self.set_hyperparameters(hyperparameters)
+
+        with torch.no_grad():
+            x = x.to(self.device)
+            num_batch, _ = x.shape
+
+            output = self.model(x, num_samples=self.test_samples)
+
+            if self.type:
+                return output, F.softmax(output)     
+
 
     def set_parameters(self, parameters):
         parameters = deepcopy(parameters)
@@ -150,6 +163,7 @@ class BNNModel(Model):
 
     def set_prior(self, priors):
         if priors is not None:
+            priors = deepcopy(priors)
             if hasattr(self, 'model'):
                 layers = [
                     module 
