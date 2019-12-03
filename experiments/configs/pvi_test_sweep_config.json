@@ -32,7 +32,7 @@
                 }
             },
             "training_config": {
-                "epochs": 100,
+                "epochs": 500,
                 "record_freq": 1
             }
         },
@@ -45,6 +45,6 @@
             "experiment_config.model_config.server_config.hyperparameters.damping_factor": [0.8, 0.9, 0.95],
             "experiment_config.model_config.data_model.hyperparameters.lr": [5e-3,1e-3,5e-4]
         },
-        "output_dir": "$SCRATCH_DIR/results/distributed-bayesian-learning/pvi-test"
+        "output_dir": "$SCRATCH_DIR/distributed-bayesian-learning/results/pvi-sweep"
     }
 }

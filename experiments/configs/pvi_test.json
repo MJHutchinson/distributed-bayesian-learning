@@ -2,9 +2,11 @@
     "experiment_config": {
         "data_config": {
             "dataset": "MNIST",
+            "type": "classification",
             "num_shards": 10,
             "data_root": "$SCRATCH_DIR/data",
-            "num_validation": 0
+            "num_validation": 0,
+            "flatten": true
         },
         "model_config": {
             "type": "pvi",
@@ -25,16 +27,16 @@
             "server_config": {
                 "type": "syncronous",
                 "hyperparameters": {
-                    "damping_factor": 0.95,
-                    "damping_decay": 1.718e-3
+                    "damping_factor": 0.8,
+                    "damping_decay": 0.0
                 }
             }
         },
         "training_config": {
-            "epochs": 100,
+            "epochs": 500,
             "record_freq": 1
         }
     },
-    "results_dir": "$SCRATCH_DIR/results/distributed-bayesian-learning/pvi-test",
-    "seeds": 3
+    "results_dir": "$SCRATCH_DIR/distributed-bayesian-learning/results/nanfinding-1",
+    "seeds": 1
 }
