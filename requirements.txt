@@ -7,7 +7,7 @@ matplotlib==3.1.2
 mccabe==0.6.1
 numpy==1.17.4
 pep8==1.7.1
-Pillow==6.2.1
+Pillow==9.3.0
 pylint==2.4.4
 pyparsing==2.4.5
 python-dateutil==2.8.1
